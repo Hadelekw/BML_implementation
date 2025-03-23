@@ -7,7 +7,31 @@ import settings
 
 def bml(lattice : np.ndarray) -> np.ndarray:
     if settings.RANDOMIZED:
-        pass  # TODO: add BML-R variant.
+        for step in range(settings.SIMULATION_STEPS):
+            coords = [
+                (random.randint(0, settings.LATTICE_WIDTH - 1),
+                 random.randint(0, settings.LATTICE_HEIGHT - 1)) for _ in range(settings.LATTICE_WIDTH**2)
+            ]
+            for (i, j) in coords:
+                if lattice[i, j] == 1:
+                    if i < settings.LATTICE_WIDTH - 1:
+                        if lattice[i + 1, j] == 0:
+                            lattice[i + 1, j] = 1
+                            lattice[i, j] = 0
+                    else:
+                        if lattice[0, j] == 0:
+                            lattice[0, j] = 1
+                            lattice[i, j] = 0
+                elif lattice[i, j] == 2:
+                    if j < settings.LATTICE_WIDTH - 1:
+                        if lattice[i, j + 1] == 0:
+                            lattice[i, j + 1] = 2
+                            lattice[i, j] = 0
+                    else:
+                        if lattice[i, 0] == 0:
+                            lattice[i, 0] = 2
+                            lattice[i, j] = 0
+            yield step, lattice
     else:
         for step in range(settings.SIMULATION_STEPS):
             if step % 2 == 0:
@@ -44,6 +68,7 @@ def main() -> None:
 
     result = bml(base_lattice)
 
+    run = True
     for step, lattice in result:
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -56,6 +81,9 @@ def main() -> None:
                     pg.draw.rect(screen, settings.DISPLAY_COLOR_1, pg.Rect(int(i * settings.SCALE), int(j * settings.SCALE), int(settings.SCALE), int(settings.SCALE)))
                 elif lattice[i, j] == 2:
                     pg.draw.rect(screen, settings.DISPLAY_COLOR_2, pg.Rect(int(i * settings.SCALE), int(j * settings.SCALE), int(settings.SCALE), int(settings.SCALE)))
+
+        if not run:
+            break
 
         pg.display.flip()
     pg.quit()
