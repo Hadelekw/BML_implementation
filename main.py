@@ -3,70 +3,24 @@ import pygame as pg
 import random
 
 import settings
-
-
-def bml(lattice : np.ndarray) -> np.ndarray:
-    if settings.RANDOMIZED:
-        for step in range(settings.SIMULATION_STEPS):
-            coords = [
-                (random.randint(0, settings.LATTICE_WIDTH - 1),
-                 random.randint(0, settings.LATTICE_HEIGHT - 1)) for _ in range(settings.LATTICE_WIDTH**2)
-            ]
-            for (i, j) in coords:
-                if lattice[i, j] == 1:
-                    if i < settings.LATTICE_WIDTH - 1:
-                        if lattice[i + 1, j] == 0:
-                            lattice[i + 1, j] = 1
-                            lattice[i, j] = 0
-                    else:
-                        if lattice[0, j] == 0:
-                            lattice[0, j] = 1
-                            lattice[i, j] = 0
-                elif lattice[i, j] == 2:
-                    if j < settings.LATTICE_WIDTH - 1:
-                        if lattice[i, j + 1] == 0:
-                            lattice[i, j + 1] = 2
-                            lattice[i, j] = 0
-                    else:
-                        if lattice[i, 0] == 0:
-                            lattice[i, 0] = 2
-                            lattice[i, j] = 0
-            yield step, lattice
-    else:
-        for step in range(settings.SIMULATION_STEPS):
-            if step % 2 == 0:
-                for i, j in zip(*np.where(lattice == 1)):
-                    if i < settings.LATTICE_WIDTH - 1:
-                        if lattice[i + 1, j] == 0:
-                            lattice[i + 1, j] = 1
-                            lattice[i, j] = 0
-                    else:
-                        if lattice[0, j] == 0:
-                            lattice[0, j] = 1
-                            lattice[i, j] = 0
-            elif step % 2 != 0:
-                for i, j in zip(*np.where(lattice == 2)):
-                    if j < settings.LATTICE_WIDTH - 1:
-                        if lattice[i, j + 1] == 0:
-                            lattice[i, j + 1] = 2
-                            lattice[i, j] = 0
-                    else:
-                        if lattice[i, 0] == 0:
-                            lattice[i, 0] = 2
-                            lattice[i, j] = 0
-            yield step, lattice
+from bml import bml, bmlr
 
 
 def main() -> None:
-    screen = pg.display.set_mode(settings.DISPLAY_SIZE)
-    base_lattice = np.zeros(settings.LATTICE_SIZE)
+    screen = pg.display.set_mode((settings.DISPLAY_SIZE, settings.DISPLAY_SIZE))
+    pg.display.set_caption('BML')
+
+    base_lattice = np.zeros((settings.LATTICE_SIZE, settings.LATTICE_SIZE))
 
     while np.sum(base_lattice != 0) / np.sum(base_lattice == 0) < settings.DENSITY:
-        i = random.randint(0, settings.LATTICE_WIDTH - 1)
-        j = random.randint(0, settings.LATTICE_HEIGHT - 1)
+        i = random.randint(0, settings.LATTICE_SIZE - 1)
+        j = random.randint(0, settings.LATTICE_SIZE - 1)
         base_lattice[i, j] = random.choice([1, 2])
 
-    result = bml(base_lattice)
+    if settings.RANDOMIZED:
+        result = bmlr(base_lattice)
+    else:
+        result = bml(base_lattice)
 
     run = True
     for step, lattice in result:
