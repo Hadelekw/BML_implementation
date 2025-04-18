@@ -32,15 +32,18 @@ def main() -> None:
 
         for i in range(lattice.shape[0]):
             for j in range(lattice.shape[1]):
-                rect = pg.Rect(int(i * settings.SCALE), int(j * settings.SCALE), int(settings.SCALE), int(settings.SCALE))
-                if lattice[i, j, 0] == 1:
-                    pg.draw.rect(screen, settings.DISPLAY_COLOR_1, rect)
-                elif lattice[i, j, 0] == 2:
-                    pg.draw.rect(screen, settings.DISPLAY_COLOR_2, rect)
-                elif lattice[i, j, 1] == 1:
-                    pg.draw.rect(screen, [c // 3 for c in settings.DISPLAY_COLOR_1], rect)
-                elif lattice[i, j, 1] == 2:
-                    pg.draw.rect(screen, [c // 3 for c in settings.DISPLAY_COLOR_2], rect)
+                if value := lattice[i, j, 0]:
+                    rect = pg.Rect(int(i * settings.SCALE), int(j * settings.SCALE), int(settings.SCALE), int(settings.SCALE))
+                    if value == 1:
+                        pg.draw.rect(screen, settings.DISPLAY_COLOR_1, rect)
+                    else:
+                        pg.draw.rect(screen, settings.DISPLAY_COLOR_2, rect)
+                elif value := lattice[i, j, 1]:
+                    rect = pg.Rect(int((settings.LATTICE_SIZE - i) * settings.SCALE), int(j * settings.SCALE), int(settings.SCALE), int(settings.SCALE))
+                    if value == 1:
+                        pg.draw.rect(screen, [c // 3 for c in settings.DISPLAY_COLOR_1], rect)
+                    else:
+                        pg.draw.rect(screen, [c // 3 for c in settings.DISPLAY_COLOR_2], rect)
 
         if not run:
             break
