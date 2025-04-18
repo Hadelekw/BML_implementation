@@ -12,7 +12,7 @@ def main() -> None:
 
     base_lattice = np.zeros((settings.LATTICE_SIZE, settings.LATTICE_SIZE))
 
-    while np.sum(base_lattice != 0) / np.sum(base_lattice == 0) < settings.DENSITY:
+    while np.sum(base_lattice != 0) / np.sum(base_lattice >= 0) < settings.DENSITY:
         i = random.randint(0, settings.LATTICE_SIZE - 1)
         j = random.randint(0, settings.LATTICE_SIZE - 1)
         base_lattice[i, j] = random.choice([1, 2])
